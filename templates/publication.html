@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar, signaler %}
+{% block content %}
+<div class="card row"><a class="ic" href="{{ url_for('views.accueil') }}" aria-label="Retour">←</a><b>Publication</b></div>
+<div class="card">
+  <div class="row">{{ avatar(p['name'], p['photo'], 'g' if p['role']=='club' else 'o') }}
+    <div style="flex:1">{% if peut_voir(p['role']) %}<a href="{{ url_for('views.profil', uid=p['uid']) }}"><b>{{ p['name'] }}</b></a>{% else %}<b>{{ p['name'] }}</b>{% endif %}
+      <div class="mu">{{ p['created_at'][:16] }} · {{ p['sport']|capitalize }}</div></div></div>
+  {% if p['body'] %}<p style="margin-top:8px;white-space:pre-wrap">{{ p['body'] }}</p>{% endif %}
+  {% if p['image'] %}<img class="pimg" src="{{ url_for('social.image', nom=p['image']) }}" alt="Photo de la publication">{% endif %}
+  <div class="acts"><button type="button" class="share" data-url="{{ url_for('social.publication', pid=p['id'], _external=True) }}"><svg><use href="#share"/></svg>Partager</button></div>
+  {% if p['uid'] == g.user['id'] %}
+  <form method="post" action="{{ url_for('social.supprimer_publication', pid=p['id']) }}" onsubmit="return confirm('Supprimer cette publication ?')">{{ csrf_field() }}<button class="btn w">Supprimer ma publication</button></form>
+  {% else %}
+  <details style="margin-top:8px"><summary class="mu" style="cursor:pointer">Signaler cette publication</summary>{{ signaler('post', p['id']) }}</details>
+  {% endif %}
+</div>
+<div class="card"><b>Commentaires</b>
+  {% for c in commentaires %}
+  <div class="row" style="align-items:flex-start;margin-top:10px">{{ avatar(c['name'], c['photo'], 'g' if c['role']=='club' else 'o') }}
+    <div style="flex:1;background:var(--bg);border-radius:12px;padding:8px 12px"><b>{{ c['name'] }}</b>
+      <div style="white-space:pre-wrap">{{ c['body'] }}</div>
+      <div class="mu">{{ c['created_at'][:16] }}{% if c['uid'] != g.user['id'] %} ·
+        <details style="display:inline"><summary style="display:inline;cursor:pointer">Signaler</summary>{{ signaler('comment', c['id']) }}</details>{% endif %}</div></div></div>
+  {% else %}<div class="mu" style="margin-top:8px">Aucun commentaire pour l’instant.</div>{% endfor %}
+  <form class="f" method="post" action="{{ url_for('social.commenter', pid=p['id']) }}" style="margin-top:12px">{{ csrf_field() }}
+    <input name="body" maxlength="500" placeholder="Écrire un commentaire…" autocomplete="off" required>
+    <button class="btn p w">Commenter</button></form>
+</div>
+{% endblock %}
