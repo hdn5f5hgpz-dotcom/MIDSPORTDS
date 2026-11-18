@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card row"><a class="ic" href="{{ url_for('views.profil') }}" aria-label="Retour">←</a><b>Administration</b></div>
+<div class="card"><b>Signalements ouverts ({{ signalements|length }})</b></div>
+{% for s in signalements %}
+<div class="card">
+  <div class="mu">{{ s['created_at'][:16] }} · signalé par {{ s['reporter'] }} · <b>{{ s['reason'] }}</b></div>
+  <div style="margin-top:6px"><span class="pill">{{ {'post':'Publication','comment':'Commentaire','user':'Profil','listing':'Annonce Market','message':'Message'}[s['kind']] }}</span>
+    {% if s['auteur'] %}de <b>{{ s['auteur_nom'] }}</b>{% endif %}</div>
+  <p style="white-space:pre-wrap;margin-top:6px">{{ s['texte'] }}</p>
+  {% if s['image'] %}<img class="pimg" src="{{ url_for('social.image', nom=s['image']) }}" alt="Photo signalée">{% endif %}
+  <div class="btns" style="display:flex;gap:6px;margin-top:8px">
+    <form method="post" action="{{ url_for('social.admin_action', rid=s['id'], action='classer') }}" style="flex:1;display:flex">{{ csrf_field() }}<button class="btn" style="width:100%">Classer</button></form>
+    {% if s['kind'] != 'user' %}<form method="post" action="{{ url_for('social.admin_action', rid=s['id'], action='supprimer') }}" style="flex:1;display:flex">{{ csrf_field() }}<button class="btn" style="width:100%">Supprimer</button></form>{% endif %}
+    {% if s['auteur'] %}<form method="post" action="{{ url_for('social.admin_action', rid=s['id'], action='suspendre') }}" style="flex:1;display:flex" onsubmit="return confirm('Suspendre ce compte ?')">{{ csrf_field() }}<button class="btn" style="width:100%;color:#e41e3f">Suspendre</button></form>{% endif %}
+  </div>
+</div>
+{% else %}<div class="card tc mu" style="padding:30px">Aucun signalement à traiter.</div>{% endfor %}
+{% if suspendus %}
+<div class="card"><b>Comptes suspendus</b>
+  {% for u in suspendus %}<div class="row" style="margin-top:8px"><span style="flex:1">{{ u['name'] }}<div class="mu">{{ u['identifier'] }}</div></span>
+    <form method="post" action="{{ url_for('social.admin_retablir', uid=u['id']) }}">{{ csrf_field() }}<button class="btn">Rétablir</button></form></div>{% endfor %}
+</div>{% endif %}
+{% endblock %}
