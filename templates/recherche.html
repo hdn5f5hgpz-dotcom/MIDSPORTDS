@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar %}
+{% block content %}
+<div class="card"><form class="f" method="get" action="{{ url_for('social.recherche') }}">
+  <input name="q" value="{{ q }}" maxlength="60" placeholder="Rechercher un club ou un joueur" autofocus>
+  <button class="btn p w">Rechercher</button></form></div>
+<div class="list">
+  {% for r in resultats %}
+  <a href="{{ url_for('views.profil', uid=r['id']) }}" style="display:flex;gap:10px;align-items:center;padding:10px 12px;background:var(--card)">
+    {{ avatar(r['name'], r['photo'], 'g' if r['role']=='club' else 'o') }}
+    <div><b>{{ r['name'] }}</b><div class="mu">{{ r['role']|capitalize }} · {{ r['sport']|capitalize }}{% if r['city'] %} · {{ r['city'] }}{% endif %}</div></div></a>
+  {% endfor %}
+  {% if q and not resultats %}<div class="tc mu" style="display:block;padding:30px">Aucun résultat pour « {{ q }} ».</div>{% endif %}
+</div>
+{% endblock %}
