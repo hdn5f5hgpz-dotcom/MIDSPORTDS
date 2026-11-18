@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar %}
+{% block content %}
+<div class="card row">{{ avatar(g.user['name'], g.user['photo']) }}
+  <a class="btn" style="flex:1;border-radius:20px;color:var(--mu)" href="{{ url_for('views.creer') }}">Quoi de neuf ?</a></div>
+{% for p in posts %}
+<div class="card">
+  <div class="row">{{ avatar(p['name'], p['photo'], 'g' if p['role']=='club' else 'o') }}
+    <div style="flex:1">
+      {% if peut_voir(p['role']) %}<a href="{{ url_for('views.profil', uid=p['uid']) }}"><b>{{ p['name'] }}</b></a>{% else %}<b>{{ p['name'] }}</b>{% endif %}
+      {% if p['uid'] != g.user['id'] and peut_voir(p['role']) %} ·
+      <form method="post" action="{{ url_for('views.suivre', uid=p['uid']) }}" style="display:inline">{{ csrf_field() }}<button class="lkb">{{ 'Abonné' if p['suivi'] else 'Suivre' }}</button></form>{% endif %}
+      <div class="mu">{{ p['created_at'][:16] }} · {{ p['sport']|capitalize }}</div>
+    </div></div>
+  {% if p['body'] %}<p style="margin-top:8px;white-space:pre-wrap">{{ p['body'] }}</p>{% endif %}
+  {% if p['image'] %}<img class="pimg" src="{{ url_for('social.image', nom=p['image']) }}" alt="Photo de la publication" loading="lazy">{% endif %}
+  <div class="mu" style="margin-top:6px">{{ p['nb_likes'] }} j’aime · {{ p['nb_comments'] }} commentaire{{ 's' if p['nb_comments'] > 1 }}</div>
+  <div class="acts">
+    <form method="post" action="{{ url_for('views.aimer', post_id=p['id']) }}">{{ csrf_field() }}
+      <button class="{{ 'liked' if p['liked'] }}"><svg><use href="#like"/></svg>J’aime</button></form>
+    <a href="{{ url_for('social.publication', pid=p['id']) }}"><svg><use href="#cmt"/></svg>Commenter</a>
+    <button type="button" class="share" data-url="{{ url_for('social.publication', pid=p['id'], _external=True) }}"><svg><use href="#share"/></svg>Partager</button>
+  </div>
+</div>
+{% else %}
+<div class="card tc mu" style="padding:30px">Aucune publication pour l’instant.<br>Soyez le premier à publier.</div>
+{% endfor %}
+{% endblock %}
