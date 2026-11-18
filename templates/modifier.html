@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card row"><a class="ic" href="{{ url_for('views.profil') }}" aria-label="Retour">←</a><b>Modifier le profil</b></div>
+<div class="card">
+  <form class="f" method="post" enctype="multipart/form-data">{{ csrf_field() }}
+    <label class="mu">Photo (JPEG, PNG ou WebP)</label>
+    <input type="file" name="photo" accept="image/jpeg,image/png,image/webp">
+    <label class="mu">Nom</label>
+    <input name="name" maxlength="80" value="{{ request.form.get('name', g.user['name']) }}" required>
+    <label class="mu">{{ 'Poste' if g.user['role'] != 'club' else 'Division ou catégorie' }}</label>
+    <input name="position" maxlength="40" value="{{ request.form.get('position', g.user['position'] or '') }}">
+    <label class="mu">Ville</label>
+    <input name="city" maxlength="60" value="{{ request.form.get('city', g.user['city'] or '') }}">
+    <label class="mu">Description (300 caractères)</label>
+    <textarea name="bio" maxlength="300">{{ request.form.get('bio', g.user['bio'] or '') }}</textarea>
+    <button class="btn p w">Enregistrer</button>
+  </form>
+</div>
+<div class="card"><b>Changer le mot de passe</b>
+  <form class="f" method="post" action="{{ url_for('social.changer_mot_de_passe') }}" style="margin-top:8px">{{ csrf_field() }}
+    <input name="actuel" type="password" placeholder="Mot de passe actuel" autocomplete="current-password" required>
+    <input name="nouveau" type="password" minlength="8" placeholder="Nouveau mot de passe (8 caractères minimum)" autocomplete="new-password" required>
+    <button class="btn w">Changer le mot de passe</button></form>
+</div>
+{% if bloques %}
+<div class="card"><b>Comptes bloqués</b>
+  {% for b in bloques %}<div class="row" style="margin-top:8px"><span style="flex:1">{{ b['name'] }}</span>
+    <form method="post" action="{{ url_for('social.bloquer', uid=b['id']) }}">{{ csrf_field() }}<button class="btn">Débloquer</button></form></div>{% endfor %}
+</div>
+{% endif %}
+<div class="card"><b>Supprimer mon compte</b>
+  <p class="mu">Votre profil, vos publications, vos messages et vos photos seront supprimés définitivement.</p>
+  <form class="f" method="post" action="{{ url_for('social.supprimer_compte') }}" onsubmit="return confirm('Supprimer définitivement votre compte ?')">{{ csrf_field() }}
+    <input name="actuel" type="password" placeholder="Votre mot de passe" autocomplete="current-password" required>
+    <button class="btn w" style="color:#e41e3f">Supprimer mon compte</button></form>
+</div>
+{% endblock %}
