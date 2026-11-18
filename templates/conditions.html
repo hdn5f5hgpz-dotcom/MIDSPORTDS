@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MidSport – Conditions d’utilisation</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icon-192.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0866ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MidSport">
+</head>
+<body>
+<div id="auth"><div class="w"><div class="box legal">
+<h2>Conditions d’utilisation de MidSport</h2>
+<p class="mu">Version de départ : à faire relire par un juriste avant l’ouverture au public.</p>
+<h3>1. Le service</h3>
+<p>MidSport est un réseau social qui met en relation des clubs, joueurs, agents et coachs de football, handball et basketball. Le service est fourni tel quel et peut être interrompu, notamment en cas de panne d’électricité ou de connexion Internet.</p>
+<h3>2. Votre compte</h3>
+<p>MidSport est réservé aux personnes de 16 ans et plus. Vous devez donner une adresse e-mail valide que vous contrôlez, des informations exactes, et garder votre mot de passe secret. Vous êtes responsable de ce qui est fait avec votre compte. Il est interdit de se faire passer pour une autre personne ou un autre club.</p>
+<h3>3. Règles de conduite</h3>
+<p>Sont interdits : le harcèlement, les menaces, les insultes, la haine, les contenus sexuels ou violents, les arnaques, les fausses annonces de joueurs, le spam, et la publication de photos ou de propos concernant une personne sans son accord. Les messages privés sont soumis aux mêmes règles.</p>
+<h3>4. Vos contenus</h3>
+<p>Vous restez propriétaire de ce que vous publiez. Vous nous autorisez à les afficher dans le service. Ne publiez que des contenus dont vous avez le droit de vous servir.</p>
+<h3>5. Signalement et sanctions</h3>
+<p>Chacun peut signaler un contenu ou un profil et bloquer un compte. L’équipe peut supprimer un contenu ou suspendre un compte qui ne respecte pas ces règles.</p>
+<h3>6. Le Market</h3>
+<p>Le Market met en relation vendeurs et acheteurs. MidSport n’est pas partie aux accords entre clubs et ne garantit ni les annonces, ni les transferts, ni les paiements entre utilisateurs. Vérifiez toujours l’identité de votre interlocuteur.</p>
+<h3>7. Fin du compte</h3>
+<p>Vous pouvez supprimer votre compte à tout moment depuis « Modifier le profil ».</p>
+<h3>8. Contact</h3>
+<p>Pour toute question : {{ contact }}.</p>
+<p class="mu" style="margin-top:14px"><a href="{{ url_for('auth.login') }}" style="color:var(--ac)">← Retour</a></p>
+</div></div></div>
+</body>
+</html>
