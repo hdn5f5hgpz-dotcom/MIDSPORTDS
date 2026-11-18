@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MidSport – Validation</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icon-192.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0866ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MidSport">
+</head>
+<body>
+<div id="auth"><div class="w">
+  <h1>MidSport</h1>
+  <form class="box" method="post" style="margin-top:16px">{{ csrf_field() }}
+    <b style="font-size:20px">Validez votre adresse e-mail</b>
+    <div class="mu" style="margin:4px 0 12px">Nous avons envoyé un code à 6 chiffres à <b>{{ g.user['identifier'] }}</b>. Il est valable 15 minutes. Pensez à regarder dans les courriers indésirables.</div>
+    {% for m in get_flashed_messages() %}<div class="er" role="alert">{{ m }}</div>{% endfor %}
+    <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Code à 6 chiffres" style="letter-spacing:6px;text-align:center;font-size:22px" required autofocus>
+    <button class="go">Valider</button>
+  </form>
+  <form method="post" action="{{ url_for('auth.verify_resend') }}" style="margin-top:10px">{{ csrf_field() }}<button class="lk">Renvoyer le code</button></form>
+  <form method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field() }}<button class="lk" style="color:var(--mu)">Se déconnecter</button></form>
+</div></div>
+</body>
+</html>
