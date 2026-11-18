@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_macros.html" import signaler %}
+{% block content %}
+<div class="card row"><b style="flex:1">Le Market</b>
+  {% if g.user['role'] == 'club' %}<a class="btn" href="{{ url_for('views.panier') }}"><svg style="width:18px;height:18px;vertical-align:middle"><use href="#cart"/></svg> {{ nb_panier }}</a>{% endif %}</div>
+{% if peut_poster %}
+<details class="card"><summary class="btn p" style="list-style:none;text-align:center">Mettre un joueur sur le marché</summary>
+  <form class="f" method="post" action="{{ url_for('views.market_publier') }}" style="margin-top:10px">{{ csrf_field() }}
+    <input name="player_name" maxlength="80" placeholder="Nom du joueur" required>
+    <input name="position" maxlength="40" placeholder="Poste" required>
+    <input name="age" type="number" min="14" max="50" placeholder="Âge" required>
+    <input name="price" type="number" min="0" placeholder="Prix en Fr (facultatif)">
+    <button class="btn p w">Publier</button>
+  </form></details>
+{% endif %}
+<details class="card" {{ 'open' if actifs }}><summary class="btn" style="list-style:none;text-align:center">Filtrer les joueurs{% if actifs %} (filtres actifs){% endif %}</summary>
+  <form class="f" method="get" action="{{ url_for('views.market') }}" style="margin-top:10px">
+    <select name="sport" aria-label="Sport">
+      <option value="">Tous les sports</option>
+      {% for s in ('football', 'handball', 'basketball') %}<option value="{{ s }}" {{ 'selected' if f['sport'] == s }}>{{ s|capitalize }}</option>{% endfor %}
+    </select>
+    <input name="poste" list="postes" maxlength="40" placeholder="Poste (ex. Attaquant)" value="{{ f['poste'] }}">
+    <datalist id="postes">{% for p in postes %}<option value="{{ p }}">{% endfor %}</datalist>
+    <div style="display:flex;gap:8px">
+      <input name="age_min" type="number" min="0" max="100" placeholder="Âge min" value="{{ f['age_min'] if f['age_min'] is not none }}">
+      <input name="age_max" type="number" min="0" max="100" placeholder="Âge max" value="{{ f['age_max'] if f['age_max'] is not none }}">
+    </div>
+    <label class="mu" style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><input type="checkbox" name="dispo" value="1" {{ 'checked' if f['dispo'] }} style="width:auto;margin:0"> Masquer les joueurs vendus</label>
+    <button class="btn p w">Appliquer</button>
+    {% if actifs %}<a class="btn w" style="display:block;text-align:center;margin-top:8px" href="{{ url_for('views.market') }}">Réinitialiser</a>{% endif %}
+  </form></details>
+<div class="mu" style="padding:6px 14px">{{ listings|length }} annonce{{ 's' if listings|length > 1 }}</div>
+<div class="grid">
+  {% for l in listings %}
+  <div class="pl" style="{{ 'opacity:.65' if l['sold'] }}"><div class="ph">{{ {'football':'⚽','basketball':'🏀','handball':'🤾'}[l['sport']] }}</div>
+    <div class="in"><div class="mu">{{ l['seller_name'] }}</div><b>{{ l['player_name'] }}</b>{% if l['sold'] %} <span class="pill">Vendu</span>{% endif %}
+      <div class="mu">{{ l['position'] }} · {{ l['age'] }} ans</div>
+      {% if l['price'] %}<div>{{ l['price']|fr }} Fr</div>{% endif %}
+      {% if l['seller_id'] == g.user['id'] %}
+      <div class="btns">
+        <form method="post" action="{{ url_for('views.market_vendu', lid=l['id']) }}">{{ csrf_field() }}<button class="btn">{{ 'Remettre en vente' if l['sold'] else 'Marquer vendu' }}</button></form>
+        <form method="post" action="{{ url_for('views.market_supprimer', lid=l['id']) }}" onsubmit="return confirm('Retirer cette annonce ?')">{{ csrf_field() }}<button class="btn">Retirer</button></form>
+      </div>
+      {% else %}
+      {% if g.user['role'] == 'club' and not l['sold'] %}
+      <div class="btns">
+        <form method="post" action="{{ url_for('views.panier_ajouter', lid=l['id']) }}">{{ csrf_field() }}<button class="btn p">Acheter</button></form>
+        <a class="btn" href="{{ url_for('views.conversation', uid=l['seller_id']) }}">Négocier</a>
+      </div>{% endif %}
+      <details><summary class="mu" style="cursor:pointer;margin-top:6px">Signaler</summary>{{ signaler('listing', l['id']) }}</details>
+      {% endif %}
+    </div></div>
+  {% else %}
+  <div class="card tc mu" style="grid-column:1/-1;padding:30px">Aucun joueur {{ 'ne correspond à ces filtres' if actifs else 'sur le marché pour l’instant' }}.</div>
+  {% endfor %}
+</div>
+{% endblock %}
