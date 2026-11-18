@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card row"><a class="ic" href="{{ url_for('views.market') }}" aria-label="Retour">←</a><b>Mon panier</b></div>
+{% for l in items %}
+<div class="card row"><div style="flex:1"><b>{{ l['player_name'] }}</b>{% if l['sold'] %} <span class="pill">Vendu</span>{% endif %}
+  <div class="mu">{{ l['position'] }} · {{ l['age'] }} ans · {{ l['seller_name'] }}{% if l['price'] %} · {{ l['price']|fr }} Fr{% endif %}</div></div>
+  <a class="btn" href="{{ url_for('views.conversation', uid=l['seller_id']) }}">Négocier</a>
+  <form method="post" action="{{ url_for('views.panier_retirer', lid=l['id']) }}">{{ csrf_field() }}<button class="btn">Retirer</button></form></div>
+{% else %}
+<div class="card tc mu" style="padding:30px">Votre panier est vide.</div>
+{% endfor %}
+{% endblock %}
