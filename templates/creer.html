@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><b>Créer une publication</b>
+  <div class="row" style="margin-top:10px"><div class="av">{{ g.user['name'][:2]|upper }}</div><div><b>{{ g.user['name'] }}</b><div class="mu">Public</div></div></div>
+  <form method="post" enctype="multipart/form-data" style="margin-top:10px">{{ csrf_field() }}
+    <textarea name="body" maxlength="2000" placeholder="Quoi de neuf ?"></textarea>
+    <label class="mu" style="display:block;margin-top:8px">Ajouter une photo (JPEG, PNG ou WebP, 10 Mo maximum)</label>
+    <input type="file" name="image" accept="image/jpeg,image/png,image/webp" style="margin-top:4px">
+    <button class="btn p w">Publier</button>
+  </form>
+</div>
+{% endblock %}
