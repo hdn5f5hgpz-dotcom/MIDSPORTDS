@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar, signaler %}
+{% block content %}
+<div class="card" style="margin:0;padding:0">
+  <div class="cover"></div>
+  {{ avatar(u['name'], u['photo'], ('g' if u['role']=='club' else 'o') ~ ' big') }}
+  <div class="tc" style="padding:8px 12px 12px">
+    <h2 style="font-size:22px">{{ u['name'] }}</h2>
+    <div class="mu">{{ stats['abonnes'] }} abonnés · {{ stats['abonnements'] }} abonnements · {{ u['sport']|capitalize }} · {{ u['role']|capitalize }}</div>
+    {% if u['position'] or u['city'] %}<div class="mu">{{ u['position'] or '' }}{% if u['position'] and u['city'] %} · {% endif %}{{ u['city'] or '' }}</div>{% endif %}
+    {% if u['bio'] %}<p style="white-space:pre-wrap;margin-top:8px">{{ u['bio'] }}</p>{% endif %}
+    {% if premium %}<span class="pill">Premium</span>{% endif %}
+    {% if moi %}
+      <a class="btn w" style="display:block" href="{{ url_for('social.modifier_profil') }}">Modifier le profil</a>
+      <div class="ok" style="margin-top:8px">⭐ L’abonnement premium arrive bientôt.</div>
+    {% else %}
+      <div class="btns" style="margin-top:8px;display:flex;gap:8px">
+        <form method="post" action="{{ url_for('views.suivre', uid=u['id']) }}" style="flex:1;display:flex">{{ csrf_field() }}
+          <input type="hidden" name="retour" value="{{ url_for('views.profil', uid=u['id']) }}">
+          <button class="btn p" style="width:100%">{{ 'Abonné' if stats['suivi'] else 'Suivre' }}</button></form>
+        {% if ecrire %}<a class="btn" style="flex:1;text-align:center" href="{{ url_for('views.conversation', uid=u['id']) }}">Écrire</a>{% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% if not moi %}
+<details class="card"><summary style="cursor:pointer">Signaler ou bloquer</summary>
+  {{ signaler('user', u['id']) }}
+  <form method="post" action="{{ url_for('social.bloquer', uid=u['id']) }}" onsubmit="return confirm('Bloquer ce compte ?')" style="margin-top:8px">{{ csrf_field() }}<button class="btn w">Bloquer ce compte</button></form>
+</details>
+{% endif %}
+{% for p in posts %}
+<div class="card"><div class="mu">{{ p['created_at'][:16] }}</div>
+  {% if p['body'] %}<p style="white-space:pre-wrap">{{ p['body'] }}</p>{% endif %}
+  {% if p['image'] %}<img class="pimg" src="{{ url_for('social.image', nom=p['image']) }}" alt="Photo" loading="lazy">{% endif %}
+  <a class="mu" href="{{ url_for('social.publication', pid=p['id']) }}">Voir la publication</a></div>
+{% else %}
+<div class="card tc mu" style="padding:30px">Aucune publication pour l’instant.</div>
+{% endfor %}
+{% if moi %}
+<div class="menu" style="margin-top:8px">
+  <form method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field() }}<button class="out">Déconnexion</button></form>
+  <a href="{{ url_for('social.conditions') }}"><button type="button">Conditions d’utilisation</button></a>
+  <a href="{{ url_for('social.confidentialite') }}"><button type="button">Politique de confidentialité</button></a>
+  {% if g.user['is_admin'] %}<a href="{{ url_for('social.admin') }}"><button type="button">Administration</button></a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}
