@@ -1,0 +1,20 @@
+{% macro avatar(nom, photo, cls='') -%}
+<div class="av {{ cls }}">{% if photo %}<img src="{{ url_for('social.image', nom=photo) }}" alt="">{% else %}{{ nom[:2]|upper }}{% endif %}</div>
+{%- endmacro %}
+{% macro signaler(kind, target, retour='') -%}
+<form class="f" method="post" action="{{ url_for('social.signaler') }}">{{ csrf_field() }}
+  <input type="hidden" name="retour" value="{{ retour }}"><input type="hidden" name="kind" value="{{ kind }}"><input type="hidden" name="target_id" value="{{ target }}">
+  <select name="reason" required aria-label="Motif">{% for r in RAISONS %}<option>{{ r }}</option>{% endfor %}</select>
+  <button class="btn w">Signaler</button>
+</form>
+{%- endmacro %}
+{% macro bulle(m) -%}
+{% set mine = m['sender_id'] == g.user['id'] %}
+<div class="b {{ 'me' if mine else 'them' }}" data-id="{{ m['id'] }}">
+  {% if m['audio'] %}<audio controls preload="none" src="{{ url_for('views.audio', mid=m['id']) }}"></audio>{% else %}{{ m['body'] }}{% endif %}
+  <div class="mu hm">{{ m['created_at'][11:16] }}
+    {% if mine %} · <form method="post" action="{{ url_for('views.message_supprimer', mid=m['id']) }}" style="display:inline" onsubmit="return confirm('Supprimer ce message pour tout le monde ?')">{{ csrf_field() }}<button class="lkb">Supprimer</button></form>
+    {% else %} · <details style="display:inline"><summary style="display:inline;cursor:pointer">Signaler</summary>{{ signaler('message', m['id'], url_for('views.conversation', uid=m['sender_id'])) }}</details>{% endif %}
+  </div>
+</div>
+{%- endmacro %}
