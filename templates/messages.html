@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><b>Messages</b></div>
+<div class="list">
+  {% for c in convs %}
+  <a href="{{ url_for('views.conversation', uid=c['id']) }}" style="display:flex;gap:10px;align-items:center;padding:10px 12px;background:var(--card)">
+    <div class="av {{ 'g' if c['role']=='club' else 'p' }}">{{ c['name'][:2]|upper }}</div>
+    <div style="flex:1"><b>{{ c['name'] }}</b><div class="mu" style="{{ 'font-weight:700;color:var(--tx)' if c['non_lus'] }}">{% if c['audio'] %}Message vocal{% else %}{{ c['body'][:60] }}{% endif %}</div></div>
+    {% if c['non_lus'] %}<span class="dot" style="position:static">{{ c['non_lus'] }}</span>{% endif %}
+  </a>
+  {% else %}
+  <div class="tc mu" style="display:block;padding:30px">Aucune conversation.<br>Écrivez à un club depuis le Market ou son profil.</div>
+  {% endfor %}
+</div>
+{% endblock %}
