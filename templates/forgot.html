@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MidSport – Mot de passe oublié</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icon-192.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0866ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MidSport">
+</head>
+<body>
+<div id="auth"><div class="w">
+  <form class="box" method="post">
+    {{ csrf_field() }}
+    <b style="font-size:20px">Retrouvez votre compte</b>
+    <div class="mu" style="margin-bottom:12px">Saisissez votre adresse e-mail pour recevoir un lien de réinitialisation.</div>
+    {% for m in get_flashed_messages() %}<div class="er" role="alert">{{ m }}</div>{% endfor %}
+    <input name="identifier" type="email" placeholder="Adresse e-mail" autocomplete="username" required>
+    <button class="go">Envoyer le lien</button>
+    <a class="lk" href="{{ url_for('auth.login') }}">Retour à la connexion</a>
+  </form>
+</div></div>
+</body>
+</html>
