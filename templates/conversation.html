@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_macros.html" import signaler, bulle with context %}
+{% block content %}
+<div class="row card" style="margin:0"><a class="ic" href="{{ url_for('views.messages') }}" aria-label="Retour">←</a>
+  <div class="av {{ 'g' if autre['role']=='club' else 'p' }}">{{ autre['name'][:2]|upper }}</div><b>{{ autre['name'] }}</b></div>
+<div id="zone" style="padding:12px;display:flex;flex-direction:column;gap:6px;min-height:240px">
+  {% for m in msgs %}{{ bulle(m) }}{% else %}<div class="mu tc" id="vide">Aucun message. Dites bonjour !</div>{% endfor %}
+</div>
+<form class="bar" method="post">{{ csrf_field() }}
+  <button type="button" class="ic" id="mic" aria-label="Message vocal"><svg><use href="#mic"/></svg></button>
+  <input name="body" placeholder="Aa" autocomplete="off" maxlength="2000">
+  <button class="btn p">Envoyer</button>
+</form>
+<div class="mu tc" style="padding:6px">Messages vocaux illimités</div>
+<details class="card"><summary class="mu" style="cursor:pointer">Signaler ou bloquer cette personne</summary>
+  {{ signaler('user', autre['id'], url_for('views.conversation', uid=autre['id'])) }}
+  <form method="post" action="{{ url_for('social.bloquer', uid=autre['id']) }}" onsubmit="return confirm('Bloquer ce compte ?')" style="margin-top:8px">{{ csrf_field() }}<button class="btn w">Bloquer ce compte</button></form>
+</details>
+<script>
+const main = document.querySelector('main'), zone = document.getElementById('zone');
+let dernier = {{ msgs[-1]['id'] if msgs else 0 }};
+main.scrollTop = main.scrollHeight;
+async function sonder() {                       // nouveaux messages, sans recharger la page
+  if (document.hidden) return;
+  try {
+    const r = await fetch('{{ url_for("views.messages_nouveaux", uid=autre["id"]) }}?apres=' + dernier);
+    if (!r.ok) return;
+    const j = await r.json();
+    if (j.html.trim()) {
+      const bas = main.scrollHeight - main.scrollTop - main.clientHeight < 120;
+      const v = document.getElementById('vide'); if (v) v.remove();
+      zone.insertAdjacentHTML('beforeend', j.html);
+      if (bas) main.scrollTop = main.scrollHeight;
+    }
+    dernier = j.dernier;
+  } catch (e) {}
+}
+setInterval(sonder, 4000);
+document.addEventListener('visibilitychange', sonder);
+
+const mic = document.getElementById('mic');
+let rec, chunks = [];
+mic.onclick = async () => {
+  if (rec && rec.state === 'recording') { rec.stop(); return; }
+  try {
+    const flux = await navigator.mediaDevices.getUserMedia({audio: true});
+    rec = new MediaRecorder(flux); chunks = [];
+    rec.ondataavailable = e => chunks.push(e.data);
+    rec.onstop = async () => {
+      flux.getTracks().forEach(t => t.stop()); mic.classList.remove('rec');
+      const fd = new FormData();
+      fd.append('csrf', '{{ session["csrf"] }}');
+      fd.append('audio', new Blob(chunks, {type: rec.mimeType}), 'vocal');
+      const r = await fetch('{{ url_for("views.vocal", uid=autre["id"]) }}', {method: 'POST', body: fd});
+      if (r.ok) location.reload(); else alert('Envoi impossible.');
+    };
+    rec.start(); mic.classList.add('rec');
+  } catch (e) { alert('Le micro n’est pas autorisé.'); }
+};
+</script>
+{% endblock %}
