@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MidSport – Erreur</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icon-192.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0866ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MidSport">
+</head>
+<body>
+<div id="auth"><div class="w">
+  <h1>MidSport</h1>
+  <div class="box tc" style="margin-top:16px">
+    <div style="font-size:40px;font-weight:800;color:var(--ac)">{{ code }}</div>
+    <p style="margin:8px 0 16px">{{ message }}</p>
+    <a class="new" href="{{ url_for('views.accueil') }}">Retour à l’accueil</a>
+  </div>
+</div></div>
+</body>
+</html>
