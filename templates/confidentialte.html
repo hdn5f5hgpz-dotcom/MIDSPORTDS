@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MidSport – Confidentialité</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icon-192.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0866ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MidSport">
+</head>
+<body>
+<div id="auth"><div class="w"><div class="box legal">
+<h2>Politique de confidentialité</h2>
+<p class="mu">Version de départ : à faire relire par un juriste avant l’ouverture au public.</p>
+<h3>Données que nous enregistrons</h3>
+<p>Adresse e-mail, mot de passe (conservé sous forme chiffrée, que nous ne pouvons pas lire), nom, sport, type de compte, et, si vous les ajoutez, photo, description, ville et poste. Aussi vos publications, commentaires, messages (texte et vocaux), abonnements, signalements et blocages.</p>
+<h3>À quoi elles servent</h3>
+<p>Faire fonctionner le service : vous connecter, valider votre adresse e-mail, afficher votre profil et vos publications, permettre les messages et le Market, et protéger la communauté. Nous ne vendons pas vos données.</p>
+<h3>Qui peut voir quoi</h3>
+<p>Les clubs peuvent voir tous les profils. Les autres comptes ne voient que les clubs. Vos messages ne sont visibles que par vous et votre correspondant, et par l’administrateur en cas de signalement.</p>
+<h3>Photos</h3>
+<p>Les informations cachées dans vos photos (comme la position GPS) sont retirées à l’envoi.</p>
+<h3>Durée de conservation</h3>
+<p>Vos données sont conservées tant que votre compte existe. Quand vous supprimez votre compte, votre profil, vos publications, vos messages et vos photos sont supprimés.</p>
+<h3>Vos droits</h3>
+<p>Vous pouvez modifier vos informations ou supprimer votre compte depuis « Modifier le profil ». Pour toute autre demande (accès à vos données, question) : {{ contact }}.</p>
+<h3>Cookies</h3>
+<p>MidSport utilise uniquement un cookie de connexion, nécessaire au fonctionnement du service. Il n’y a ni publicité, ni suivi.</p>
+<p class="mu" style="margin-top:14px"><a href="{{ url_for('auth.login') }}" style="color:var(--ac)">← Retour</a></p>
+</div></div></div>
+</body>
+</html>
