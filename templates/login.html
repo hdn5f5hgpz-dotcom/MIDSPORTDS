@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MidSport – Connexion</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icon-192.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0866ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MidSport">
+</head>
+<body>
+<div id="auth"><div class="w">
+  <h1>MidSport</h1>
+  <div class="sub">Le réseau des clubs et des joueurs de football, handball et basketball.</div>
+  <form class="box" method="post">
+    {{ csrf_field() }}
+    {% for m in get_flashed_messages() %}<div class="er" role="alert">{{ m }}</div>{% endfor %}
+    <input name="identifier" type="email" placeholder="Adresse e-mail" autocomplete="username" required>
+    <input name="password" type="password" placeholder="Mot de passe" autocomplete="current-password" required>
+    <button class="go">Se connecter</button>
+    <a class="lk" href="{{ url_for('auth.forgot') }}">Mot de passe oublié ?</a>
+    <hr style="margin-top:18px">
+    <a class="new" href="{{ url_for('auth.register') }}">Créer un compte</a>
+    <div class="mu tc" style="margin-top:14px"><a href="{{ url_for('social.conditions') }}">Conditions</a> · <a href="{{ url_for('social.confidentialite') }}">Confidentialité</a></div>
+  </form>
+</div></div>
+</body>
+</html>
