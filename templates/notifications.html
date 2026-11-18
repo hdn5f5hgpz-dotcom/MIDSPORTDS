@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><b>Notifications</b></div>
+<div class="list">
+  {% for n in items %}
+  <div class="{{ 'new' if not n['read'] }}">
+    <div class="av">{{ n['text'][:1]|upper }}</div>
+    <div style="flex:1">{% if n['link'] %}<a href="{{ n['link'] }}">{{ n['text'] }}</a>{% else %}{{ n['text'] }}{% endif %}
+      <div class="mu">{{ n['created_at'][:16] }}</div></div>
+  </div>
+  {% else %}
+  <div class="tc mu" style="display:block;padding:30px">Aucune notification pour l’instant.</div>
+  {% endfor %}
+</div>
+{% endblock %}
