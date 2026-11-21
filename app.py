@@ -15,9 +15,9 @@ def create_app():
     prod = bool(os.environ.get("MIDSPORT_PROD"))
     if prod and not os.environ.get("SECRET_KEY"):
         raise RuntimeError("Définissez SECRET_KEY en production.")
-    if prod and not os.environ.get("SMTP_HOST"):
-        raise RuntimeError("Définissez SMTP_HOST (et SMTP_USER, SMTP_PASSWORD) : sans e-mail, "
-                           "personne ne peut valider son compte.")
+    if prod and not (os.environ.get("BREVO_API_KEY") or os.environ.get("SMTP_HOST")):
+        raise RuntimeError("Définissez BREVO_API_KEY et MAIL_FROM (ou SMTP_HOST, SMTP_USER, SMTP_PASSWORD) : "
+                           "sans e-mail, personne ne peut valider son compte.")
     app.config.update(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-seulement-changez-moi"),
         DATABASE=os.path.join(app.instance_path, "midsport.sqlite"),
@@ -82,3 +82,4 @@ def create_app():
 
 
 app = create_app()
+
