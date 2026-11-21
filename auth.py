@@ -1,12 +1,15 @@
 import functools
 import hashlib
 import hmac
+import json
 import os
 import re
 import secrets
 import smtplib
 import sqlite3
 import time
+import urllib.error
+import urllib.request
 from email.message import EmailMessage
 from flask import (Blueprint, current_app, flash, g, redirect, render_template, request,
                    session, url_for)
@@ -79,8 +82,28 @@ def _ouvrir_session(user_id):
 
 # ---- e-mails et limites ---------------------------------------------------------------
 def envoyer_mail(destinataire, sujet, corps):
-    """Envoie un e-mail par SMTP (variables SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, MAIL_FROM).
-    Sans SMTP et hors production, le message s'affiche dans la console du serveur."""
+    """Envoie un e-mail.
+    1. Par l'API web de Brevo si BREVO_API_KEY est défini (avec MAIL_FROM = adresse validée chez Brevo) :
+       fonctionne sur Render même gratuit, car cela passe par HTTPS et non par les ports SMTP, bloqués.
+    2. Sinon par SMTP (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, MAIL_FROM).
+    Sans rien de cela et hors production, le message s'affiche dans la console du serveur."""
+    cle_brevo = os.environ.get("BREVO_API_KEY")
+    if cle_brevo:
+        expediteur = os.environ.get("MAIL_FROM")
+        if not expediteur:
+            raise RuntimeError("MAIL_FROM manquant : indiquez l'adresse d'expéditeur validée chez Brevo")
+        corps_json = json.dumps({"sender": {"name": "MidSport", "email": expediteur},
+                                 "to": [{"email": destinataire}], "subject": sujet, "textContent": corps}).encode()
+        requete = urllib.request.Request("https://api.brevo.com/v3/smtp/email", data=corps_json, method="POST",
+                                         headers={"api-key": cle_brevo, "content-type": "application/json",
+                                                  "accept": "application/json"})
+        try:
+            with urllib.request.urlopen(requete, timeout=10):
+                pass
+        except urllib.error.HTTPError as e:
+            detail = e.read()[:300].decode("utf-8", "replace")
+            raise RuntimeError(f"Brevo a refusé l'envoi (code {e.code}) : {detail}") from None
+        return
     hote = os.environ.get("SMTP_HOST")
     if hote:
         msg = EmailMessage()
@@ -198,7 +221,8 @@ def register():
                 erreur = "Un compte existe déjà avec cet e-mail."
             else:
                 _ouvrir_session(cur.lastrowid)
-                _envoyer_code(cur.lastrowid, ident)
+                if not _envoyer_code(cur.lastrowid, ident):
+                    flash("Le code n’a pas pu être envoyé par e-mail. Réessayez avec « Renvoyer le code » dans un moment.")
                 return redirect(url_for("auth.verify"))
         flash(erreur)
     return render_template("register.html")
@@ -335,3 +359,4 @@ def reset(token):
             flash("Mot de passe modifié. Connectez-vous avec le nouveau.")
             return redirect(url_for("auth.login"))
     return render_template("reset.html")
+
